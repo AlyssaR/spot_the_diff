@@ -13,7 +13,7 @@ try:
 	url = sys.argv[2].lower()
 except:
 	print "\n[ERROR] Please enter a mode and URL."
-	print "Correct usage: ./diffyqueue.py [diff | scan] http://www.someurl.com [OPTIONAL: YY-MM-DD] \n"
+	print "Correct usage: ./spot_the_diff.py [diff | scan] http://www.someurl.com [OPTIONAL: YY-MM-DD] \n"
 	exit()
 
 if mode == "diff":
