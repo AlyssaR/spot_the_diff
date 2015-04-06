@@ -1,13 +1,5 @@
 import os, report, scan, sys
 
-#################
-## Set Up Self ##
-#################
-if not os.path.exists("reports"):
-	os.makedirs("reports")
-if not os.path.exists("scans"):
-	os.makedirs("scans")
-
 try:
 	mode = sys.argv[1].lower()
 	url = sys.argv[2].lower()
