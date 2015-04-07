@@ -7,20 +7,24 @@ def genReport(url, new_scan, date):
 	report = BeautifulSoup(open("./templates/template.html", 'r').read())
 	
 	### In future do this for each page in list
-	filepath = getFilePath(url, False).split("/")
-	report.oldscan.string = date
-	report.newscan.string = time.strftime("%y-%m-%d")
-	report.target.string = filepath[2]
-	report.targetpage.string = filepath[-1]
-	
 	#Add results
 	diff = report.diff
 	diff.string = ""
 	date, changes = analyzePage(url, new_scan, date)
-	diff.append(report.new_string(changes[0]))
-	for line in changes[1:]:
+	if changes == "No changes.":
+		diff.append(changes)
 		diff.append(report.new_tag('br'))
-		diff.append(report.new_string(line))
+	else:
+		diff.append(report.new_string(changes[0]))
+		for line in changes[1:]:
+			diff.append(report.new_tag('br'))
+			diff.append(report.new_string(line))
+
+	filepath = getFilePath(url, False).split("/")
+	report.oldscan.string = date
+	report.newscan.string = time.strftime("%y-%m-%d")
+	report.target.string = url
+	report.targetpage.string = "/".join(filepath[4:])
 
 	#Write changes to compiled report
 	filename = "./reports/" + "/".join(filepath[2:4]) + "/report.html"
@@ -63,7 +67,7 @@ def getFilePath(url, isReport):
 	except:
 		if page == "":
 			page = "index"
-		if isReport:
+		if isReport: #Change so it creates a .txt even for pages with extensions
 			page = page + ".txt"
 		else:
 			page = page + ".html"
@@ -71,9 +75,9 @@ def getFilePath(url, isReport):
 	path = curFolder + "/" + page
 	return path
 
-def loadScan(url, date, isReport):
+def loadScan(url, date):
 	print "[+] Loading scan..."
-	filepath = getFilePath(url, isReport).split('/')
+	filepath = getFilePath(url, False).split('/')
 	domainDir = "/".join(filepath[:3])
 	latestScan = sorted(os.listdir(domainDir))
 	
@@ -108,5 +112,8 @@ def saveScan(url, scan, isReport):
 
 	output = open(filename, "w+")
 	output.write(scan)
-	print "[+] Saved scan in: " + filename
+	if isReport:
+		print "[+] Saved diff in:", filename
+	else:
+		print "[+] Saved scan in:", filename
 	output.close()
