@@ -8,6 +8,7 @@ def grab(url):
 	try:
 		page = urllib2.urlopen(url)
 		soup = BeautifulSoup(page.read(), "lxml")
+		page.close()
 	except:
 		print "\n[ERROR] Could not open page."
 		print "Please enter in URL valid form.\n"

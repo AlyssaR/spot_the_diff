@@ -9,7 +9,9 @@ An engine intended to be able to:
   - Output a user friendly report of any changes made
 
 <strong>In the Future:</strong>
-Eventually I'd like to develop the scanner capabilities as well by adding the functionality of analyzing a site based on Yara signatures. 
+  - Expand scanner with Yara signatures
+  - Change verbosity of report outputted
+  - Change file format of output
 
 <strong>Basic Usage:</strong>
 ./spot_the_diff.py [diff | scan] http://www.someurl.com [OPTIONAL: YY-MM-DD]
