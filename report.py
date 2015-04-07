@@ -78,8 +78,11 @@ def loadScan(url, date, isReport):
 	latestScan = os.listdir(domainDir)
 	
 	#Get most recent scan
-	if latestScan[-1] is not None:
+	if date is "None" and latestScan is not None:
 		date = latestScan[-1]
+	else if date is "None":
+		print "[ERROR] No saved scans found for", url
+		exit()
 
 	filepath[3] = date
 	filepath = "/".join(filepath)

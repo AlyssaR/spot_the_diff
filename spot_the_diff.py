@@ -12,8 +12,7 @@ if mode == "diff":
 	try:
 		date = sys.argv[3]
 	except:
-		print "\n[ERROR] Please enter a date in the form: YY-MM-DD."
-		exit()
+		date = "None"
 		
 	current = scan.grab(url)
 	report.genReport(url, str(current), date) 
