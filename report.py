@@ -4,19 +4,28 @@ import analyze, os, re, time
 def genReport(url, new_scan, date):
 	print "[+] Generating report..."
 
-	### In future do this for each page in list and save to new list
-	changes = analyzePage(url, new_scan, date)
-	filepath = getFilePath(url, False).split("/")
-
-	report = "<html><head><title>Summary of Changes for " + filepath[2] + "</title></head>\n"
-	report = report + changes + "</body></html>"
+	report = BeautifulSoup(open("./templates/template.html", 'r').read())
 	
+	### In future do this for each page in list
+	filepath = getFilePath(url, False).split("/")
+	report.oldscan.string = date
+	report.newscan.string = time.strftime("%y-%m-%d")
+	report.target.string = filepath[2]
+	report.targetpage.string = filepath[-1]
+	
+	#Add results
+	diff = report.diff
+	diff.string = ""
+	changes = analyzePage(url, new_scan, date)
+	diff.append(report.new_string(changes[0]))
+	for line in changes[1:]:
+		diff.append(report.new_tag('br'))
+		diff.append(report.new_string(line))
+
 	#Write changes to compiled report
 	filename = "./reports/" + "/".join(filepath[2:4]) + "/report.html"
-	output = open(filename, "w+")
-	output.write(report)
+	open(filename, "w+").write(str(report))
 	print "[+] Saved final report in: " + filename
-	output.close()
 
 def getFilePath(url, isReport):
 	#Extract important parts of URL
@@ -54,7 +63,10 @@ def getFilePath(url, isReport):
 	except:
 		if page == "":
 			page = "index"
-		page = page + ".html"
+		if isReport:
+			page = page + ".txt"
+		else:
+			page = page + ".html"
 
 	path = curFolder + "/" + page
 	return path
@@ -72,20 +84,15 @@ def loadScan(url, date, isReport):
 def analyzePage(url, new_scan, date):
 	#Set up report structure
 	page = getFilePath(url, False).split("/")[-1]
-	report = "<html><head><title>" + page + "</title></head>\n<body>"
-	diff = "<h2>SpotTheDiff: " + page + "</h2>\n"
-	diff = diff + "<h3>Changes from " + date + " (-) to " + time.strftime("%y-%m-%d") + " (+)</h3><br>\n"
-	
+
 	#Add data 
-	changes = str(analyze.diffy(url, new_scan, date))
-	if changes == "":
-		changes = "<strong>No changes.</strong>"
-	diff = diff + changes 
+	changes = analyze.diffy(url, new_scan, date)
+	if len(changes) == 0:
+		changes = "No changes."
 
 	#Save
-	report = report + diff + "</body></html>"
-	saveScan(url, report, True)
-	return diff
+	saveScan(url, str(changes), True)
+	return changes
 
 def saveScan(url, scan, isReport):
 	filename = getFilePath(url, isReport)
