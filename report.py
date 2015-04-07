@@ -16,7 +16,7 @@ def genReport(url, new_scan, date):
 	#Add results
 	diff = report.diff
 	diff.string = ""
-	changes = analyzePage(url, new_scan, date)
+	date, changes = analyzePage(url, new_scan, date)
 	diff.append(report.new_string(changes[0]))
 	for line in changes[1:]:
 		diff.append(report.new_tag('br'))
@@ -74,25 +74,31 @@ def getFilePath(url, isReport):
 def loadScan(url, date, isReport):
 	print "[+] Loading scan..."
 	filepath = getFilePath(url, isReport).split('/')
+	domainDir = "/".join(filepath[:3])
+	latestScan = os.listdir(domainDir)
+	
+	#Get most recent scan
+	if latestScan[-1] is not None:
+		date = latestScan[-1]
+
 	filepath[3] = date
 	filepath = "/".join(filepath)
-	### domain = "/".join(filepath[:2])
-	### Get highest value/most recent path
+
 	### In future return list of soups
-	return BeautifulSoup(open(filepath, 'r').read())
+	return date, BeautifulSoup(open(filepath, 'r').read())
 
 def analyzePage(url, new_scan, date):
 	#Set up report structure
 	page = getFilePath(url, False).split("/")[-1]
 
 	#Add data 
-	changes = analyze.diffy(url, new_scan, date)
+	date, changes = analyze.diffy(url, new_scan, date)
 	if len(changes) == 0:
 		changes = "No changes."
 
 	#Save
 	saveScan(url, str(changes), True)
-	return changes
+	return date, changes
 
 def saveScan(url, scan, isReport):
 	filename = getFilePath(url, isReport)

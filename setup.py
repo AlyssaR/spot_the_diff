@@ -1,3 +1,5 @@
+import os
+
 # Install Beautiful Soup
 
 # Install LXML
